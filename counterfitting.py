@@ -431,12 +431,15 @@ def run_experiment(config_filepath):
 
 
 def main():
-
+	"""
+	The user can provide the location of the config file as an argument. 
+	If no location is specified, the default config file (experiment_parameters.cfg) is used.
+	"""
 	try:
 		config_filepath = sys.argv[1]
 	except:
-		print "Please supply the location of a valid counter-fitting config file."
-		return
+		print "Using the default config file: experiment_parameters.cfg"
+		config_filepath = "experiment_parameters.cfg"
 
 	run_experiment(config_filepath)
 
