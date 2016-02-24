@@ -1,12 +1,12 @@
 # Counter-fitting Word Vectors to Linguistic Constraints
-Nikola Mrkšić, nm480@cam.ac.uk
+Nikola Mrkšić (nm480@cam.ac.uk)
 
 This repository contains the code and data for the tool presented in [Counter-fitting Word Vectors to Linguistic Constraints](http://mi.eng.cam.ac.uk/~nm480/naaclhlt2016.pdf). The produced word vectors, which achieve the present state of the art (0.74) on the SimLex-999 dataset are also included in this repository. 
 
 
 ###Configuring the Tool
 
-The counter-fitting tool reads all the experiment config parameters from the experiment_parameters.cfg file in the root directory. An alternative config file can be provided as the first (and only) argument to counterfitting.py 
+The counter-fitting tool reads all the experiment config parameters from the ```experiment_parameters.cfg``` file in the root directory. An alternative config file can be provided as the first (and only) argument to counterfitting.py 
 
 The config file specifies:
 * the location of the initial word vectors ```[default: word_vectors/glove.txt]```
@@ -25,15 +25,16 @@ The results directory also contains the SimLex-999 dataset (Hill et al., 2014), 
 
 Running the experiment loads the word vectors specified in the config file and counter-fits them to the provided linguistic constraints. The procedure prints the updated word vectors to the results directory as ```counter_fitted_vectors.txt``` (one word vector per line). The produced ranking and the gold standard ranking for the SimLex-999 pairs are also printed to the results directory. 
 
-The word_vectors directory contains the (zipped) GloVe and Paragram-300-SL999 vectors constrained to our vocabulary. The (zipped) high-scoring vectors for SimLex-999 can be found in ```word_vectors/counter-fitted-vectors.txt.zip```.
+The word_vectors directory contains the (zipped) GloVe and Paragram-300-SL999 vectors constrained to our vocabulary. The (zipped) high-scoring vectors for SimLex-999 can be found in ```word_vectors/counter-fitted-vectors.txt.zip``` (or reproduced by running counter-fitting on the Paragram vectors).
 
 
-###Reference
+###References
 
 The counter-fitting paper:
 ```
 @InProceedings{mrksic:2016:naacl,
-  author    = {Nikola Mrk\v{s}i\'c and Diarmuid {\'O S\'eaghdha} and Blaise Thomson and Milica Ga\v{s}i\'c and Lina Rojas-Barahona and Pei-Hao Su and David Vandyke and Tsung-Hsien Wen and Steve Young},
+  author    = {Nikola Mrk\v{s}i\'c and Diarmuid {\'O S\'eaghdha} and Blaise Thomson and Milica Ga\v{s}i\'c 
+  			   and Lina Rojas-Barahona and Pei-Hao Su and David Vandyke and Tsung-Hsien Wen and Steve Young},
   title     = {Counter-fitting Word Vectors to Linguistic Constraints},
   booktitle = {Proceedings of HLT-NAACL},
   year      = {2016},
