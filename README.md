@@ -1,7 +1,7 @@
 # Counter-fitting Word Vectors to Linguistic Constraints
 Nikola Mrkšić, nm480@cam.ac.uk
 
-This repository contains the code and input data for the counter-fitting algorithm presented in (Mrkšić, Ò Séaghdha et al., 2016). The produced word vectors which achieve the present state of the art (0.74) on the SimLex-999 dataset are also included in this repository. 
+This repository contains the code and input data for the counter-fitting algorithm presented in (Mrkšić, Ó Séaghdha et al., 2016). The produced word vectors which achieve the present state of the art (0.74) on the SimLex-999 dataset are also included in this repository. 
 
 
 ###Configuring the Tool
