@@ -1,14 +1,20 @@
 # Counter-fitting Word Vectors to Linguistic Constraints
 Nikola Mrkšić, nm480@cam.ac.uk
 
-This repository contains the code and input data for the counter-fitting algorithm presented in (Mrkšić, Ó Séaghdha et al., 2016). The produced word vectors which achieve the present state of the art (0.74) on the SimLex-999 dataset are also included in this repository. 
+This repository contains the code and data for the tool presented in [Counter-fitting Word Vectors to Linguistic Constraints](http://mi.eng.cam.ac.uk/~nm480/naaclhlt2016.pdf). The produced word vectors, which achieve the present state of the art (0.74) on the SimLex-999 dataset are also included in this repository. 
 
 
 ###Configuring the Tool
 
 The counter-fitting tool reads all the experiment config parameters from the experiment_parameters.cfg file in the root directory. An alternative config file can be provided as the first (and only) argument to counterfitting.py 
 
-The config file specifies the locations of the starting word vectors, the vocabulary to be used and the sets of linguistic constraints to be injected into the vector space. Optionally, the user can also specify the location of a dialogue domain ontology in the DSTC format, which will be used to infer additional antonymy constraints. The config file also specifies the six hyperparameters of the counter-fitting procedure (set to default values in experiment_parameters.cfg). 
+The config file specifies:
+* the location of the initial word vectors ```[default: word_vectors/glove.txt]```
+* the (restricted) vocabulary to be used ```[default: lingustic_constraints/vocabulary.txt])``` 
+* the sets of linguistic constraints to be injected into the vector space. 
+* optionally, one can also specify the location of a dialogue domain ontology (in the DSTC format). The ontology will be used to infer additional antonymy constraints. 
+
+The config file also specifies the six hyperparameters of the counter-fitting procedure (set to default values in experiment_parameters.cfg). 
 
 The linguistic_constraints directory contains the synonymy and antonymy constraints used in the paper. These are drawn from WordNet and the PPDB 2.0 XXXL packages. The directory also contains the vocabulary used in our experiments and the SimLex-999 dataset, required to perform the evaluation. 
 
@@ -17,5 +23,21 @@ The linguistic_constraints directory contains the synonymy and antonymy constrai
 
 ```python counterfitting.py experiment_parameters.cfg```
 
-Running the experiment loads the word vectors specified in the config file and counter-fits them to the provided linguistic constraints. If no .cfg file is specified the default one is used. The procedure prints the final vectors to the results directory as a .txt file (one word vector per line). The produced ranking and the gold standard ranking for the SimLex-999 pairs are also printed to the results directory. 
+Running the experiment loads the word vectors specified in the config file and counter-fits them to the provided linguistic constraints. The procedure prints the updated word vectors to the results directory as a .txt file (one word vector per line). The produced ranking and the gold standard ranking for the SimLex-999 pairs are also printed to the results directory. 
 
+The word_vectors directory contains the (zipped) GloVe and Paragram-300-SL999 vectors constrained to our vocabulary. It also contains a (zipped) version of the high scoring SimLex-999 vectors (counterfitted-vectors.txt.zip).
+
+
+###Reference
+
+The counter-fitting paper:
+```
+@InProceedings{mrksic:2016:naacl,
+  author    = {Nikola Mrk\v{s}i\'c and Diarmuid {\'O S\'eaghdha} and Blaise Thomson and Milica Ga\v{s}i\'c and Lina Rojas-Barahona and Pei-Hao Su and David Vandyke and Tsung-Hsien Wen and Steve Young},
+  title     = {Counter-fitting Word Vectors to Linguistic Constraints},
+  booktitle = {Proceedings of HLT-NAACL},
+  year      = {2016},
+}
+```
+
+If you are using PPDB 2.0 (Pavlick et al., 2015) or WordNet (Miller, 1995) constraints, please cite these papers. If you are using the provided pre-trained vectors, please cite (Pennington et al., 2014) for GloVe vectors (Wieting et al., 2015) for Paragram-SL-999 vectors. 
