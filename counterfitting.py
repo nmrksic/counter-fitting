@@ -117,7 +117,7 @@ def print_word_vectors(word_vectors, write_path):
 	print "Saving word vectors to", write_path, "\n"
 	with open(write_path, "wb") as f_write:
 		for key in word_vectors:
-			print >>f_write, key, " ".join(map(str, numpy.round(word_vectors[key], decimals=4))) 
+			print >>f_write, key, " ".join(map(str, numpy.round(word_vectors[key], decimals=6))) 
 
 
 def normalise_word_vectors(word_vectors, norm=1.0):
@@ -419,6 +419,8 @@ def run_experiment(config_filepath):
 	"""
 	current_experiment = ExperimentRun(config_filepath)
 	
+	#print_word_vectors(current_experiment.pretrained_word_vectors, "word_vectors/counter-fitted-vectors.txt")
+
 	print "\nSimLex score (Spearman's rho coefficient) of initial vectors is:", \
 		   simlex_analysis(current_experiment.pretrained_word_vectors), "\n"
 	

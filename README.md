@@ -10,22 +10,22 @@ The counter-fitting tool reads all the experiment config parameters from the exp
 
 The config file specifies:
 * the location of the initial word vectors ```[default: word_vectors/glove.txt]```
-* the (restricted) vocabulary to be used ```[default: lingustic_constraints/vocabulary.txt])``` 
-* the sets of linguistic constraints to be injected into the vector space. 
-* optionally, one can also specify the location of a dialogue domain ontology (in the DSTC format). The ontology will be used to infer additional antonymy constraints. 
+* the (restricted) vocabulary to be used ```[default: lingustic_constraints/vocabulary.txt]``` 
+* the sets of linguistic constraints to be injected into the vector space. The ```linguistic_constraints``` directory contains the synonymy (PPDB 2.0) and antonymy (WordNet and PPDB 2.0) constraints used in our experiments. 
+* optionally, one can also specify the location of a dialogue domain ontology (in the DSTC format). This ontology will be used to infer additional antonymy constraints between slot values. 
 
-The config file also specifies the six hyperparameters of the counter-fitting procedure (set to default values in experiment_parameters.cfg). 
+The config file also specifies the six hyperparameters of the counter-fitting procedure (set to their default values in experiment_parameters.cfg). 
 
-The linguistic_constraints directory contains the synonymy and antonymy constraints used in the paper. These are drawn from WordNet and the PPDB 2.0 XXXL packages. The directory also contains the vocabulary used in our experiments and the SimLex-999 dataset, required to perform the evaluation. 
+The results directory also contains the SimLex-999 dataset (Hill et al., 2014), required to perform the evaluation. 
 
 
 ###Running Experiments
 
 ```python counterfitting.py experiment_parameters.cfg```
 
-Running the experiment loads the word vectors specified in the config file and counter-fits them to the provided linguistic constraints. The procedure prints the updated word vectors to the results directory as a .txt file (one word vector per line). The produced ranking and the gold standard ranking for the SimLex-999 pairs are also printed to the results directory. 
+Running the experiment loads the word vectors specified in the config file and counter-fits them to the provided linguistic constraints. The procedure prints the updated word vectors to the results directory as ```counter_fitted_vectors.txt``` (one word vector per line). The produced ranking and the gold standard ranking for the SimLex-999 pairs are also printed to the results directory. 
 
-The word_vectors directory contains the (zipped) GloVe and Paragram-300-SL999 vectors constrained to our vocabulary. It also contains a (zipped) version of the high scoring SimLex-999 vectors (counterfitted-vectors.txt.zip).
+The word_vectors directory contains the (zipped) GloVe and Paragram-300-SL999 vectors constrained to our vocabulary. The (zipped) high-scoring vectors for SimLex-999 can be found in ```word_vectors/counter-fitted-vectors.txt.zip```.
 
 
 ###Reference
@@ -40,4 +40,4 @@ The counter-fitting paper:
 }
 ```
 
-If you are using PPDB 2.0 (Pavlick et al., 2015) or WordNet (Miller, 1995) constraints, please cite these papers. If you are using the provided pre-trained vectors, please cite (Pennington et al., 2014) for GloVe vectors (Wieting et al., 2015) for Paragram-SL-999 vectors. 
+If you are using PPDB 2.0 (Pavlick et al., 2015) or WordNet (Miller, 1995) constraints, please cite these papers. If you are using the provided pre-trained vectors, please cite (Pennington et al., 2014) for GloVe vectors and (Wieting et al., 2015) for Paragram-SL-999 vectors. 
