@@ -53,10 +53,11 @@ class ExperimentRun:
 
 		# We check if a dialogue ontology has been supplied (this supplies extra antonyms):
 		try:
-			ontology_filepath = self.config.get("data", "ontology_filepath")
+			ontology_filepath = self.config.get("data", "ontology_filepath").replace(" ", "")
 			dialogue_ontology = json.load(open(ontology_filepath, "rb"))
+			print "\nExtracting antonyms from the dialogue ontology specified in", ontology_filepath
 			ontology_antonyms = extract_antonyms_from_dialogue_ontology(dialogue_ontology, self.vocabulary)
-			print "Successfully extracted", len(ontology_antonyms), "from", ontology_filepath, "\n"
+			print "Extracted", len(ontology_antonyms), "antonyms from", ontology_filepath, "\n"
 			self.antonyms |= ontology_antonyms
 		except:
 			print "No dialogue ontology supplied: using just the supplied synonyms and antonyms.\n"
@@ -68,16 +69,13 @@ class ExperimentRun:
 		for ant_filepath in antonym_list:
 			self.antonyms = self.antonyms | load_constraints(ant_filepath, self.vocabulary)
 
-		print "\nTotal synonym count:", len(self.synonyms)
-		print "Total antonym pair count:", len(self.antonyms), "\n"
-
 		# finally, load the experiment hyperparameters:
 		self.load_experiment_hyperparameters()
 
 
 	def load_experiment_hyperparameters(self):
 		"""
-		This method loads/sets the hyperparameters of the procedure as specified in the NAACL paper.
+		This method loads/sets the hyperparameters of the procedure as specified in the paper.
 		"""
 		self.hyper_k1 = self.config.getfloat("hyperparameters", "hyper_k1")
 		self.hyper_k2 = self.config.getfloat("hyperparameters", "hyper_k2") 
@@ -86,7 +84,7 @@ class ExperimentRun:
 		self.gamma    = self.config.getfloat("hyperparameters", "gamma")
 		self.rho      = self.config.getfloat("hyperparameters", "rho")
 
-		print "Experiment hyperparameters (k_1, k_2, k_3, delta, gamma, rho):", \
+		print "\nExperiment hyperparameters (k_1, k_2, k_3, delta, gamma, rho):", \
 			   self.hyper_k1, self.hyper_k2, self.hyper_k3, self.delta, self.gamma, self.rho
 
 
@@ -113,7 +111,7 @@ def print_word_vectors(word_vectors, write_path):
 	"""
 	This function prints the collection of word vectors to file, in a plain textual format. 
 	"""
-	print "Saving word vectors to", write_path, "\n"
+	print "Saving the counter-fitted word vectors to", write_path, "\n"
 	with open(write_path, "wb") as f_write:
 		for key in word_vectors:
 			print >>f_write, key, " ".join(map(str, numpy.round(word_vectors[key], decimals=6))) 
@@ -153,6 +151,9 @@ def extract_antonyms_from_dialogue_ontology(dialogue_ontology, vocabulary):
 	Returns a list of antonyms for the supplied dialogue ontology, which needs to be provided as a dictionary.
 	The dialogue ontology must follow the DST Challenges format: we only care about goal slots, i.e. informables.
 	"""
+	# We are only interested in the goal slots of the ontology:
+	dialogue_ontology = dialogue_ontology["informable"]
+
 	slot_names = set(dialogue_ontology.keys())
 
 	# Forcing antonymous relations between different entity names does not make much sense. 
@@ -163,10 +164,14 @@ def extract_antonyms_from_dialogue_ontology(dialogue_ontology, vocabulary):
 	binary_slots = set()
 	for slot_name in slot_names:
 		current_values = dialogue_ontology[slot_name]
-		if len(current_values) == 2 and "True" in current_values and "False" in current_values:
+		if len(current_values) == 2 and "true" in current_values and "false" in current_values:
 			binary_slots |= {slot_name}
 
-	print "Removing binary slots:", binary_slots
+	if binary_slots:
+		print "Removing binary slots:", binary_slots
+	else:
+		print "There are no binary slots to ignore."
+
 	slot_names = slot_names - binary_slots
 
 	antonym_list = set()
@@ -176,6 +181,7 @@ def extract_antonyms_from_dialogue_ontology(dialogue_ontology, vocabulary):
 		current_values = dialogue_ontology[slot_name]
 		for index_1, value in enumerate(current_values):
 			for index_2 in range(index_1 + 1, len(current_values)):
+				# note that this will ignore all multi-value words. 
 				if value in vocabulary and current_values[index_2] in vocabulary:
 					antonym_list |= {(value, current_values[index_2])}
 					antonym_list |= {(current_values[index_2], value)}
@@ -202,7 +208,7 @@ def compute_vsp_pairs(word_vectors, vocabulary, rho=0.2):
 	In order to manage memory, this method computes dot-products of different subsets of word 
 	vectors and then reconstructs the indices of the word vectors that are deemed to be similar.
 	"""
-	print "Pre-computing all the word pairs which are to be enforced via the VSP term. Rho =", rho
+	print "Pre-computing word pairs relevant for Vector Space Preservation (VSP). Rho =", rho
 	
 	vsp_pairs = {}
 
@@ -267,7 +273,7 @@ def compute_vsp_pairs(word_vectors, vocabulary, rho=0.2):
 					vsp_pairs[(left_word, right_word)] = score
 					vsp_pairs[(right_word, left_word)] = score
 		
-	print "There are", len(vsp_pairs), "VSP relations to enforce for rho =", rho, "\n"
+	# print "There are", len(vsp_pairs), "VSP relations to enforce for rho =", rho, "\n"
 	return vsp_pairs
 
 
@@ -289,7 +295,7 @@ def vector_partial_gradient(u, v, normalised_vectors=True):
 	return gradient
 
 
-def one_step_SGD(word_vectors, synonym_pairs, antonym_pairs, vsp_pairs, current_experiment, iteration_count=0):
+def one_step_SGD(word_vectors, synonym_pairs, antonym_pairs, vsp_pairs, current_experiment):
 	"""
 	This method performs a step of SGD to optimise the counterfitting cost function.
 	"""
@@ -308,7 +314,7 @@ def one_step_SGD(word_vectors, synonym_pairs, antonym_pairs, vsp_pairs, current_
 		if current_distance < current_experiment.delta:
 	
 			gradient = vector_partial_gradient( new_word_vectors[word_i], new_word_vectors[word_j])
-			gradient = gradient * current_experiment.hyper_k1 #* distance_discrepancy
+			gradient = gradient * current_experiment.hyper_k1 
 
 			if word_i in gradient_updates:
 				gradient_updates[word_i] += gradient
@@ -373,8 +379,8 @@ def counter_fit(current_experiment):
 	
 	vsp_pairs = {}
 
-	if current_experiment.hyper_k3 > 0.0: # if we are doing VSP
-		vsp_pairs = compute_vsp_pairs(word_vectors, vocabulary, rho=current_experiment.rho)
+	if current_experiment.hyper_k3 > 0.0: # if we need to compute the VSP terms.
+ 		vsp_pairs = compute_vsp_pairs(word_vectors, vocabulary, rho=current_experiment.rho)
 	
 	# Post-processing: remove synonym pairs which are deemed to be both synonyms and antonyms:
 	for antonym_pair in antonyms:
@@ -384,13 +390,12 @@ def counter_fit(current_experiment):
 			del vsp_pairs[antonym_pair]
 
 	max_iter = 20
-	print "Ready to run optimisation procedure for", max_iter, "SGD steps."
-	print "Antonym pairs:", len(antonyms), "Synonym pairs:", len(synonyms), "VSP pairs:", len(vsp_pairs)
+	print "\nAntonym pairs:", len(antonyms), "Synonym pairs:", len(synonyms), "VSP pairs:", len(vsp_pairs)
+	print "Running the optimisation procedure for", max_iter, "SGD steps..."
 
 	while current_iteration < max_iter:
 		current_iteration += 1
-		word_vectors = one_step_SGD(word_vectors, synonyms, antonyms, vsp_pairs, 
-									current_experiment, current_iteration)
+		word_vectors = one_step_SGD(word_vectors, synonyms, antonyms, vsp_pairs, current_experiment)
 
 	return word_vectors
 
@@ -466,7 +471,7 @@ def run_experiment(config_filepath):
 	"""
 	current_experiment = ExperimentRun(config_filepath)
 	
-	print "\nSimLex score (Spearman's rho coefficient) of initial vectors is:", \
+	print "SimLex score (Spearman's rho coefficient) of initial vectors is:", \
 		   simlex_analysis(current_experiment.pretrained_word_vectors), "\n"
 	
 	transformed_word_vectors = counter_fit(current_experiment)
@@ -485,7 +490,7 @@ def main():
 	try:
 		config_filepath = sys.argv[1]
 	except:
-		print "Using the default config file: experiment_parameters.cfg"
+		print "\nUsing the default config file: experiment_parameters.cfg"
 		config_filepath = "experiment_parameters.cfg"
 
 	run_experiment(config_filepath)
