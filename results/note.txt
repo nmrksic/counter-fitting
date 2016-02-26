@@ -1,0 +1,1 @@
+This directory will contain the output word vectors (counter_fitted_vectors.txt). It will also contain the ranking of SimLex pairs that is produced using the counter-fitted vectors, as well as the gold standard SimLex ranking, included for comparison.  

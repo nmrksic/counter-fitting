@@ -4,6 +4,7 @@ import sys
 import time
 import random 
 import math
+import os
 from copy import deepcopy
 import json
 from numpy.linalg import norm
@@ -42,6 +43,11 @@ class ExperimentRun:
 		
 		# load pretrained word vectors and initialise their (restricted) vocabulary. 
 		self.pretrained_word_vectors = load_word_vectors(pretrained_vectors_filepath, vocabulary)
+
+		# if no vectors were loaded, exit gracefully:
+		if not self.pretrained_word_vectors:
+			return
+
 		self.vocabulary = set(self.pretrained_word_vectors.keys())
 
 		# load list of filenames for synonyms and antonyms. 
@@ -96,12 +102,18 @@ def load_word_vectors(file_destination, vocabulary):
 	print "Loading pretrained word vectors from", file_destination
 	word_dictionary = {}
 
-	with open(file_destination, "r") as f:
-		for line in f:
-			line = line.split(" ", 1)	
-			key = line[0].lower()
-			if key in vocabulary:	
-				word_dictionary[key] = numpy.fromstring(line[1], dtype="float32", sep=" ")
+	try:
+		with open(file_destination, "r") as f:
+			for line in f:
+				line = line.split(" ", 1)	
+				key = line[0].lower()
+				if key in vocabulary:	
+					word_dictionary[key] = numpy.fromstring(line[1], dtype="float32", sep=" ")
+	except:
+		print "Word vectors could not be loaded from:", file_destination
+		if file_destination == "word_vectors/glove.txt" or file_destination == "word_vectors/paragram.txt":
+			print "Please unzip the provided glove/paragram vectors in the word_vectors directory.\n"
+		return {}
 
 	print len(word_dictionary), "vectors loaded from", file_destination			
 	return normalise_word_vectors(word_dictionary)
@@ -470,6 +482,8 @@ def run_experiment(config_filepath):
 	results directory.
 	"""
 	current_experiment = ExperimentRun(config_filepath)
+	if not current_experiment.pretrained_word_vectors:
+		return
 	
 	print "SimLex score (Spearman's rho coefficient) of initial vectors is:", \
 		   simlex_analysis(current_experiment.pretrained_word_vectors), "\n"
