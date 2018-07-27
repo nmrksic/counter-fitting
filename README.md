@@ -19,7 +19,7 @@ The config file also specifies the six hyperparameters of the counter-fitting pr
 The results directory also contains the SimLex-999 dataset (Hill et al., 2014), required to perform the evaluation. 
 
 
-###Running Experiments
+### Running Experiments
 
 ```python counterfitting.py experiment_parameters.cfg```
 
@@ -28,7 +28,7 @@ Running the experiment loads the word vectors specified in the config file and c
 The word_vectors directory contains the (zipped) GloVe and Paragram-300-SL999 vectors constrained to our vocabulary (these need to be unzipped before the experiments are run). The high-scoring vectors for SimLex-999 can also be found in ```word_vectors/counter-fitted-vectors.txt.zip``` (or reproduced by applying counter-fitting to Paragram vectors).
 
 
-###References
+### References
 
 The counter-fitting paper:
 ```
