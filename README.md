@@ -4,7 +4,7 @@ Nikola Mrkšić (nm480@cam.ac.uk)
 This repository contains the code and data for the method presented in [Counter-fitting Word Vectors to Linguistic Constraints](http://mi.eng.cam.ac.uk/~nm480/naaclhlt2016.pdf). The word vectors which achieve the (present) state of the art (0.74) on the SimLex-999 dataset are included in this repository, but can also be downloaded [here](http://mi.eng.cam.ac.uk/~nm480/counter-fitted-vectors.txt.zip).
 
 
-###Configuring the Tool
+### Configuring the Tool
 
 The counter-fitting tool reads all the experiment config parameters from the ```experiment_parameters.cfg``` file in the root directory. An alternative config file can be provided as the first (and only) argument to ```counterfitting.py```. 
 
