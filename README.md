@@ -1,10 +1,10 @@
 # Counter-fitting Word Vectors to Linguistic Constraints
 Nikola Mrkšić (nm480@cam.ac.uk)
 
-This repository contains the code and data for the method presented in [Counter-fitting Word Vectors to Linguistic Constraints](http://mi.eng.cam.ac.uk/~nm480/naaclhlt2016.pdf). The word vectors which achieve the (present) state of the art (0.74) on the SimLex-999 dataset are included in this repository, but can also be downloaded [here](http://mi.eng.cam.ac.uk/~nm480/counter-fitted-vectors.txt.zip).
+This repository contains the code and data for the method presented in [Counter-fitting Word Vectors to Linguistic Constraints](https://arxiv.org/pdf/1603.00892.pdf). The word vectors which achieve the (present) state of the art (0.74) on the SimLex-999 dataset are included in this repository, but can also be downloaded [here](http://mi.eng.cam.ac.uk/~nm480/counter-fitted-vectors.txt.zip).
 
 
-###Configuring the Tool
+### Configuring the Tool
 
 The counter-fitting tool reads all the experiment config parameters from the ```experiment_parameters.cfg``` file in the root directory. An alternative config file can be provided as the first (and only) argument to ```counterfitting.py```. 
 
@@ -19,7 +19,7 @@ The config file also specifies the six hyperparameters of the counter-fitting pr
 The results directory also contains the SimLex-999 dataset (Hill et al., 2014), required to perform the evaluation. 
 
 
-###Running Experiments
+### Running Experiments
 
 ```python counterfitting.py experiment_parameters.cfg```
 
@@ -28,7 +28,7 @@ Running the experiment loads the word vectors specified in the config file and c
 The word_vectors directory contains the (zipped) GloVe and Paragram-300-SL999 vectors constrained to our vocabulary (these need to be unzipped before the experiments are run). The high-scoring vectors for SimLex-999 can also be found in ```word_vectors/counter-fitted-vectors.txt.zip``` (or reproduced by applying counter-fitting to Paragram vectors).
 
 
-###References
+### References
 
 The counter-fitting paper:
 ```

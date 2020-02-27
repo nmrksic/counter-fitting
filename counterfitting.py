@@ -1,4 +1,4 @@
-import ConfigParser
+import configparser
 import numpy
 import sys
 import time
@@ -24,11 +24,11 @@ class ExperimentRun:
 		domain ontology to inject (optional, needs to respect DSTC format), as well as the six 
 		hyperparameters of the counterfitting procedure (as detailed in the NAACL paper).
 		"""
-		self.config = ConfigParser.RawConfigParser()
+		self.config = configparser.RawConfigParser()
 		try:
 			self.config.read(config_filepath)
 		except:
-			print "Couldn't read config file from", config_filepath
+			print("Couldn't read config file from", config_filepath)
 			return None
 
 		pretrained_vectors_filepath = self.config.get("data", "pretrained_vectors_filepath")
@@ -61,12 +61,12 @@ class ExperimentRun:
 		try:
 			ontology_filepath = self.config.get("data", "ontology_filepath").replace(" ", "")
 			dialogue_ontology = json.load(open(ontology_filepath, "rb"))
-			print "\nExtracting antonyms from the dialogue ontology specified in", ontology_filepath
+			print("\nExtracting antonyms from the dialogue ontology specified in", ontology_filepath)
 			ontology_antonyms = extract_antonyms_from_dialogue_ontology(dialogue_ontology, self.vocabulary)
-			print "Extracted", len(ontology_antonyms), "antonyms from", ontology_filepath, "\n"
+			print("Extracted", len(ontology_antonyms), "antonyms from", ontology_filepath, "\n")
 			self.antonyms |= ontology_antonyms
 		except:
-			print "No dialogue ontology supplied: using just the supplied synonyms and antonyms.\n"
+			print("No dialogue ontology supplied: using just the supplied synonyms and antonyms.\n")
 
 		# and we then have all the information to collect all the linguistic constraints:
 		for syn_filepath in synonym_list:
@@ -90,8 +90,8 @@ class ExperimentRun:
 		self.gamma    = self.config.getfloat("hyperparameters", "gamma")
 		self.rho      = self.config.getfloat("hyperparameters", "rho")
 
-		print "\nExperiment hyperparameters (k_1, k_2, k_3, delta, gamma, rho):", \
-			   self.hyper_k1, self.hyper_k2, self.hyper_k3, self.delta, self.gamma, self.rho
+		print("\nExperiment hyperparameters (k_1, k_2, k_3, delta, gamma, rho):",
+			   self.hyper_k1, self.hyper_k2, self.hyper_k3, self.delta, self.gamma, self.rho)
 
 
 def load_word_vectors(file_destination, vocabulary):
@@ -99,23 +99,23 @@ def load_word_vectors(file_destination, vocabulary):
 	This method loads the word vectors from the supplied file destination. 
 	It loads the dictionary of word vectors and prints its size and the vector dimensionality. 
 	"""
-	print "Loading pretrained word vectors from", file_destination
+	print("Loading pretrained word vectors from", file_destination)
 	word_dictionary = {}
 
 	try:
 		with open(file_destination, "r") as f:
 			for line in f:
-				line = line.split(" ", 1)	
+				line = line.split(" ", 1)
 				key = line[0].lower()
 				if key in vocabulary:	
 					word_dictionary[key] = numpy.fromstring(line[1], dtype="float32", sep=" ")
 	except:
-		print "Word vectors could not be loaded from:", file_destination
+		print("Word vectors could not be loaded from:", file_destination)
 		if file_destination == "word_vectors/glove.txt" or file_destination == "word_vectors/paragram.txt":
-			print "Please unzip the provided glove/paragram vectors in the word_vectors directory.\n"
+			print("Please unzip the provided glove/paragram vectors in the word_vectors directory.\n")
 		return {}
 
-	print len(word_dictionary), "vectors loaded from", file_destination			
+	print(len(word_dictionary), "vectors loaded from", file_destination	)
 	return normalise_word_vectors(word_dictionary)
 
 
@@ -123,10 +123,11 @@ def print_word_vectors(word_vectors, write_path):
 	"""
 	This function prints the collection of word vectors to file, in a plain textual format. 
 	"""
-	print "Saving the counter-fitted word vectors to", write_path, "\n"
-	with open(write_path, "wb") as f_write:
+	print("Saving the counter-fitted word vectors to", write_path, "\n")
+	with open(write_path, "w") as f_write:
 		for key in word_vectors:
-			print >>f_write, key, " ".join(map(str, numpy.round(word_vectors[key], decimals=6))) 
+			# print >>f_write, key, " ".join(map(str, numpy.round(word_vectors[key], decimals=6))) 
+			f_write.write(key + ' ' + " ".join(map(str, numpy.round(word_vectors[key], decimals=6))) + '\n')
 
 
 def normalise_word_vectors(word_vectors, norm=1.0):
@@ -153,7 +154,7 @@ def load_constraints(constraints_filepath, vocabulary):
 				constraints |= {(word_pair[0], word_pair[1])}
 				constraints |= {(word_pair[1], word_pair[0])}
 
-	print constraints_filepath, "yielded", len(constraints), "constraints."
+	print(constraints_filepath, "yielded", len(constraints), "constraints.")
 
 	return constraints
 
@@ -180,9 +181,9 @@ def extract_antonyms_from_dialogue_ontology(dialogue_ontology, vocabulary):
 			binary_slots |= {slot_name}
 
 	if binary_slots:
-		print "Removing binary slots:", binary_slots
+		print("Removing binary slots:", binary_slots)
 	else:
-		print "There are no binary slots to ignore."
+		print("There are no binary slots to ignore.")
 
 	slot_names = slot_names - binary_slots
 
@@ -220,7 +221,7 @@ def compute_vsp_pairs(word_vectors, vocabulary, rho=0.2):
 	In order to manage memory, this method computes dot-products of different subsets of word 
 	vectors and then reconstructs the indices of the word vectors that are deemed to be similar.
 	"""
-	print "Pre-computing word pairs relevant for Vector Space Preservation (VSP). Rho =", rho
+	print("Pre-computing word pairs relevant for Vector Space Preservation (VSP). Rho =", rho)
 	
 	vsp_pairs = {}
 
@@ -229,7 +230,7 @@ def compute_vsp_pairs(word_vectors, vocabulary, rho=0.2):
 	num_words = len(vocabulary)
 
 	step_size = 1000 # Number of word vectors to consider at each iteration. 
-	vector_size = random.choice(word_vectors.values()).shape[0]
+	vector_size = random.choice(list(word_vectors.values())).shape[0]
 
 	# ranges of word vector indices to consider:
 	list_of_ranges = []
@@ -402,8 +403,8 @@ def counter_fit(current_experiment):
 			del vsp_pairs[antonym_pair]
 
 	max_iter = 20
-	print "\nAntonym pairs:", len(antonyms), "Synonym pairs:", len(synonyms), "VSP pairs:", len(vsp_pairs)
-	print "Running the optimisation procedure for", max_iter, "SGD steps..."
+	print("\nAntonym pairs:", len(antonyms), "Synonym pairs:", len(synonyms), "VSP pairs:", len(vsp_pairs))
+	print("Running the optimisation procedure for", max_iter, "SGD steps...")
 
 	while current_iteration < max_iter:
 		current_iteration += 1
@@ -418,7 +419,7 @@ def simlex_analysis(word_vectors):
 	The method also prints the gold standard SimLex-999 ranking to results/simlex_ranking.txt, 
 	and the ranking produced using the counter-fitted vectors to results/counter_ranking.txt 
 	"""
-	fread_simlex = open("linguistic_constraints/SimLex-999.txt", "rb")
+	fread_simlex = open("linguistic_constraints/SimLex-999.txt", "r")
 	pair_list = []
 
 	line_number = 0
@@ -434,8 +435,8 @@ def simlex_analysis(word_vectors):
 
 	pair_list.sort(key=lambda x: - x[1])
 
-	f_out_simlex = open("results/simlex_ranking.txt", "wb")
-	f_out_counterfitting = open("results/counter_ranking.txt", "wb")
+	f_out_simlex = open("results/simlex_ranking.txt", "w")
+	f_out_counterfitting = open("results/counter_ranking.txt", "w")
 
 	extracted_list = []
 	extracted_scores = {}
@@ -455,11 +456,13 @@ def simlex_analysis(word_vectors):
 
 	for idx, element in enumerate(pair_list):
 		clean_elem = str(parse_pair(element[0])) + " : " +  str(round(element[1], 2))
-		print >>f_out_simlex, idx, ":", clean_elem
+		# print >>f_out_simlex, idx, ":", clean_elem
+		f_out_simlex.write(str(idx) + " :" + clean_elem + '\n')
 
 	for idx, element in enumerate(extracted_list):
 		clean_elem = str(parse_pair(element[0])) + " : " + str(round(element[1], 2))
-		print >>f_out_counterfitting, idx, ":", clean_elem
+		# print >>f_out_counterfitting, idx, ":", clean_elem
+		f_out_counterfitting.write(str(idx) + " :" + clean_elem + '\n')
 
 	spearman_original_list = []
 	spearman_target_list = []
@@ -485,13 +488,13 @@ def run_experiment(config_filepath):
 	if not current_experiment.pretrained_word_vectors:
 		return
 	
-	print "SimLex score (Spearman's rho coefficient) of initial vectors is:", \
-		   simlex_analysis(current_experiment.pretrained_word_vectors), "\n"
+	print("SimLex score (Spearman's rho coefficient) of initial vectors is:",
+		   simlex_analysis(current_experiment.pretrained_word_vectors), "\n")
 	
 	transformed_word_vectors = counter_fit(current_experiment)
 	
-	print "\nSimLex score (Spearman's rho coefficient) the counter-fitted vectors is:", \
-		   simlex_analysis(transformed_word_vectors), "\n"
+	print("\nSimLex score (Spearman's rho coefficient) the counter-fitted vectors is:",
+		   simlex_analysis(transformed_word_vectors), "\n")
 	
 	print_word_vectors(transformed_word_vectors, "results/counter_fitted_vectors.txt")
 
@@ -504,9 +507,10 @@ def main():
 	try:
 		config_filepath = sys.argv[1]
 	except:
-		print "\nUsing the default config file: experiment_parameters.cfg"
+		print("\nUsing the default config file: experiment_parameters.cfg")
 		config_filepath = "experiment_parameters.cfg"
 
+	random.seed()
 	run_experiment(config_filepath)
 
 
