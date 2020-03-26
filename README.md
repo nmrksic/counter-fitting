@@ -1,7 +1,7 @@
 # Counter-fitting Word Vectors to Linguistic Constraints
 Nikola Mrkšić (nm480@cam.ac.uk)
 
-This repository contains the code and data for the method presented in [Counter-fitting Word Vectors to Linguistic Constraints](http://mi.eng.cam.ac.uk/~nm480/naaclhlt2016.pdf). The word vectors which achieve the (present) state of the art (0.74) on the SimLex-999 dataset are included in this repository, but can also be downloaded [here](http://mi.eng.cam.ac.uk/~nm480/counter-fitted-vectors.txt.zip).
+This repository contains the code and data for the method presented in [Counter-fitting Word Vectors to Linguistic Constraints](https://arxiv.org/pdf/1603.00892.pdf). The word vectors which achieve the (present) state of the art (0.74) on the SimLex-999 dataset are included in this repository, but can also be downloaded [here](http://mi.eng.cam.ac.uk/~nm480/counter-fitted-vectors.txt.zip).
 
 
 ###Configuring the Tool
